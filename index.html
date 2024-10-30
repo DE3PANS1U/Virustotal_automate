@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Check Webpage</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; }
+        table, th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>IP Scanner</h1>
+    <form id="ipForm">
+        <label for="ips">Enter IPs (comma separated):</label>
+        <input type="text" id="ips" name="ips" required>
+        <button type="submit">Check IPs</button>
+    </form>
+
+    <h2>Results:</h2>
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>IP</th>
+                <th>ID</th>
+                <th>Malicious Count</th>
+                <th>AS Label</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        document.getElementById('ipForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const ips = document.getElementById('ips').value.split(',').map(ip => ip.trim());
+            
+            fetch('/check_ips', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ips: ips })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsTable = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
+                resultsTable.innerHTML = '';  // Clear previous results
+
+                data.forEach(result => {
+                    const row = resultsTable.insertRow();
+                    row.insertCell(0).innerText = result.id;
+                    row.insertCell(1).innerText = result.id;
+                    row.insertCell(2).innerText = result.malicious;
+                    row.insertCell(3).innerText = result.as_label;
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
